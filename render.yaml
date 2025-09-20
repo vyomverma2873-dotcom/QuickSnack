@@ -1,0 +1,51 @@
+services:
+  # Backend API Service
+  - type: web
+    name: quicksnack-backend
+    env: node
+    rootDir: backend
+    buildCommand: npm ci
+    startCommand: npm start
+    plan: free
+    runtime: node
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: 18
+      - key: MONGO_URI
+        value: mongodb+srv://QuickSnack:QuickSnack%4037@quicksnack.wmea4h4.mongodb.net/?retryWrites=true&w=majority&appName=QuickSnack
+      - key: JWT_SECRET
+        generateValue: true
+      - key: JWT_EXPIRES_IN
+        value: 7d
+      - key: EMAIL_USER
+        value: vyomverma2873@gmail.com
+      - key: EMAIL_PASS
+        value: lefofhjcstycxxvz
+      - key: SMTP_HOST
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: 587
+      - key: FRONTEND_URL
+        fromService:
+          type: web
+          name: quicksnack-frontend
+          property: host
+
+  # Frontend Next.js WEB Service (NOT Static Site)
+  - type: web
+    name: quicksnack-frontend
+    env: node
+    rootDir: frontend
+    buildCommand: npm ci && npm run build
+    startCommand: node server.js
+    plan: free
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NEXT_PUBLIC_API_BASE_URL
+        fromService:
+          type: web
+          name: quicksnack-backend
+          property: host
