@@ -8,7 +8,6 @@
     "dev": "nodemon server.js"
   },
   "dependencies": {
-    "@sendgrid/mail": "^8.1.6",
     "axios": "^1.5.0",
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
@@ -20,6 +19,7 @@
     "mongoose": "^7.5.0",
     "nanoid": "^5.1.5",
     "nodemailer": "^6.9.4",
+    "resend": "^6.3.0",
     "validator": "^13.11.0"
   },
   "devDependencies": {

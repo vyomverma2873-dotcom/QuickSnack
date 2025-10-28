@@ -1,30 +1,21 @@
-const sgMail = require('@sendgrid/mail');
+const { Resend } = require('resend');
 
-// Initialize SendGrid
-if (process.env.SENDGRID_API_KEY) {
-  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
-} else {
-  console.warn('SENDGRID_API_KEY is not set. Emails will fail to send.');
-}
+// Initialize Resend
+const resend = new Resend(process.env.RESEND_API_KEY);
 
 const sendEmail = async (to, subject, html) => {
   try {
-    const msg = {
-      to,
-      from: {
-        email: process.env.EMAIL_USER || 'no-reply@quicksnack.app',
-        name: 'QuickSnack'
-      },
+    const result = await resend.emails.send({
+      from: 'QuickSnack <onboarding@resend.dev>', // Free Resend domain
+      to: [to],
       subject,
       html
-    };
+    });
 
-    const result = await sgMail.send(msg);
-    const messageId = result?.[0]?.headers?.['x-message-id'] || 'unknown';
-    console.log('Email sent successfully via SendGrid:', messageId);
-    return { success: true, messageId };
+    console.log('Email sent successfully via Resend:', result.data?.id);
+    return { success: true, messageId: result.data?.id };
   } catch (error) {
-    console.error('SendGrid email sending failed:', error);
+    console.error('Resend email sending failed:', error);
     return { success: false, error: error?.message || 'Failed to send email' };
   }
 };

@@ -19,8 +19,8 @@ services:
         generateValue: true
       - key: JWT_EXPIRES_IN
         value: 7d
-      - key: SENDGRID_API_KEY
-        value: YOUR_SENDGRID_API_KEY
+      - key: RESEND_API_KEY
+        value: YOUR_RESEND_API_KEY
       - key: EMAIL_USER
         value: vyomverma2873@gmail.com
       # The following Gmail SMTP settings are no longer used after switching to SendGrid
