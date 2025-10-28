@@ -12,6 +12,7 @@ const placesRoutes = require('./routes/places');
 const adminRoutes = require('./routes/admin');
 const cartRoutes = require('./routes/cart');
 const productsRoutes = require('./routes/products');
+const debugRoutes = require('./routes/debug');
 
 const app = express();
 
@@ -93,6 +94,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/places', placesRoutes);
 app.use('/api/products', productsRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/debug', debugRoutes);
 
 // Root endpoint
 app.get('/', (req, res) => {
