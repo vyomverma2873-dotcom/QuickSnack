@@ -81,10 +81,19 @@ app.use((req, res, next) => {
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('Connected to MongoDB Atlas'))
-  .catch(err => console.error('MongoDB connection error:', err));
+// Connect to MongoDB with better error handling
+mongoose.connect(process.env.MONGO_URI, {
+  serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s
+})
+  .then(() => {
+    console.log('✅ Connected to MongoDB Atlas');
+    console.log(`Database: ${mongoose.connection.name}`);
+  })
+  .catch(err => {
+    console.error('❌ MongoDB connection error:', err.message);
+    console.error('Full error:', err);
+    // Don't exit - let Render see the error in logs
+  });
 
 // Routes
 app.use('/api/auth', authRoutes);
@@ -138,6 +147,10 @@ app.use('*', (req, res) => {
 });
 
 const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => {
-  console.log(`QuickSnack server running on port ${PORT}`);
+const HOST = '0.0.0.0'; // Bind to all network interfaces for Render
+
+app.listen(PORT, HOST, () => {
+  console.log(`QuickSnack server running on ${HOST}:${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(`MongoDB: ${mongoose.connection.readyState === 1 ? 'Connected' : 'Disconnected'}`);
 });

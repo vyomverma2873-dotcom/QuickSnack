@@ -8,6 +8,7 @@ services:
     startCommand: npm start
     plan: free
     runtime: node
+    healthCheckPath: /api/health
     envVars:
       - key: NODE_ENV
         value: production
@@ -20,7 +21,7 @@ services:
       - key: JWT_EXPIRES_IN
         value: 7d
       - key: RESEND_API_KEY
-        value: YOUR_RESEND_API_KEY
+        value: re_bT6YpFvC_EUnKUkCqTwdTyYBH6bVwRSKF
       - key: EMAIL_USER
         value: vyomverma2873@gmail.com
       # The following Gmail SMTP settings are no longer used after switching to SendGrid
