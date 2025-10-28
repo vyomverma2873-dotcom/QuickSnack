@@ -1,21 +1,52 @@
-const { Resend } = require('resend');
+const nodemailer = require('nodemailer');
 
-// Initialize Resend
-const resend = new Resend(process.env.RESEND_API_KEY);
+// Create Nodemailer transporter
+const transporter = nodemailer.createTransport({
+  host: process.env.SMTP_HOST || 'smtp.gmail.com',
+  port: parseInt(process.env.SMTP_PORT) || 587,
+  secure: false, // true for 465, false for other ports
+  auth: {
+    user: process.env.EMAIL_USER,
+    pass: process.env.EMAIL_PASS
+  }
+});
+
+// Verify transporter configuration
+transporter.verify(function (error, success) {
+  if (error) {
+    console.error('❌ Email transporter verification failed:', error);
+  } else {
+    console.log('✅ Email server is ready to send messages');
+  }
+});
 
 const sendEmail = async (to, subject, html) => {
   try {
-    const result = await resend.emails.send({
-      from: 'QuickSnack <onboarding@resend.dev>', // Free Resend domain
-      to: [to],
-      subject,
-      html
-    });
+    console.log(`📧 Attempting to send email to: ${to}`);
+    console.log(`   Subject: ${subject}`);
+    console.log(`   From: ${process.env.EMAIL_USER}`);
+    
+    const mailOptions = {
+      from: `"QuickSnack" <${process.env.EMAIL_USER}>`,
+      to: to,
+      subject: subject,
+      html: html
+    };
 
-    console.log('Email sent successfully via Resend:', result.data?.id);
-    return { success: true, messageId: result.data?.id };
+    const info = await transporter.sendMail(mailOptions);
+    
+    console.log('✅ Email sent successfully via Nodemailer!');
+    console.log(`   Message ID: ${info.messageId}`);
+    console.log(`   To: ${to}`);
+    console.log(`   Response: ${info.response}`);
+    
+    return { success: true, messageId: info.messageId };
   } catch (error) {
-    console.error('Resend email sending failed:', error);
+    console.error('❌ Nodemailer email sending failed!');
+    console.error(`   To: ${to}`);
+    console.error(`   Error: ${error?.message}`);
+    console.error(`   Full error:`, error);
+    
     return { success: false, error: error?.message || 'Failed to send email' };
   }
 };

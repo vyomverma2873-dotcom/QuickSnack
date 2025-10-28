@@ -43,9 +43,7 @@ This guide covers deploying QuickSnack to Render, a modern cloud platform for ho
    JWT_SECRET=your-secure-random-string-here
    JWT_EXPIRES_IN=7d
    EMAIL_USER=vyomverma2873@gmail.com
-   EMAIL_PASS=lefofhjcstycxxvz
-   SMTP_HOST=smtp.gmail.com
-   SMTP_PORT=587
+   RESEND_API_KEY=your_resend_api_key_here
    FRONTEND_URL=https://your-frontend-url.onrender.com
    ```
 
@@ -129,19 +127,17 @@ The app will automatically create these collections:
 
 ## 📧 Email Configuration
 
-### Gmail SMTP Setup
-1. **Enable 2-Factor Authentication** on Gmail
-2. **Generate App Password**:
-   - Google Account → Security → App passwords
-   - Select "Mail" and generate password
-3. **Use App Password** in EMAIL_PASS environment variable
+### Resend API Setup
+1. **Sign up for Resend**: https://resend.com
+2. **Generate API Key**:
+   - Go to API Keys section
+   - Create new API key
+3. **Use API Key** in RESEND_API_KEY environment variable
 
 ### Email Settings
 ```env
 EMAIL_USER=vyomverma2873@gmail.com
-EMAIL_PASS=your-16-character-app-password
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
+RESEND_API_KEY=your_resend_api_key_here
 ```
 
 ## 🔐 Security Considerations
@@ -206,9 +202,9 @@ git push origin main
 - Verify API URL is correctly set
 
 **Email Not Sending**:
-- Verify Gmail app password (not regular password)
-- Check SMTP settings
-- Ensure 2FA is enabled on Gmail
+- Verify Resend API key is correct
+- Check Resend dashboard for delivery status
+- Ensure API key has proper permissions
 
 **Database Connection Issues**:
 - Verify MongoDB Atlas IP whitelist

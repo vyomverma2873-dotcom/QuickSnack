@@ -16,7 +16,7 @@ A full-stack fast food delivery application with real-time search, order managem
 - **Smart matching** across product names, categories, and descriptions
 - **Visual highlighting** of search terms
 - **Quick add to cart** directly from search suggestions
-- **Email OTP Authentication**: Secure signup/login with Nodemailer
+- **Email OTP Authentication**: Secure signup/login with Resend API
 - **Real Address Autocomplete**: Google Places API integration
 - **Order Management**: Unique order IDs with email confirmations
 - **Responsive Design**: Mobile-first, aesthetic UI
@@ -60,13 +60,13 @@ A full-stack fast food delivery application with real-time search, order managem
 - **Framework**: Express.js
 - **Database**: MongoDB Atlas with Mongoose
 - **Authentication**: JWT + bcrypt
-- **Email Service**: Nodemailer (Gmail SMTP)
+- **Email Service**: Resend API
 - **Security**: Helmet, CORS, Rate Limiting
 - **Validation**: Validator.js
 
 ### External Services
 - **Database**: MongoDB Atlas
-- **Email**: Gmail SMTP (Nodemailer)
+- **Email**: Resend API
 - **Maps**: Google Places API (with fallback)
 - **Backend Deployment**: Render - https://quicksnack-final-backend.onrender.com
 - **Frontend Deployment**: Vercel (recommended)
@@ -139,10 +139,7 @@ MONGO_URI=mongodb+srv://QuickSnack:QuickSnack%4037@quicksnack.wmea4h4.mongodb.ne
 JWT_SECRET=your_super_secret_jwt_key_here
 JWT_EXPIRES_IN=7d
 EMAIL_USER=vyomverma2873@gmail.com
-EMAIL_PASS=lefofhjcstycxxvz
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
-GOOGLE_PLACES_API_KEY=your_google_places_api_key_here
+RESEND_API_KEY=your_resend_api_key_here
 FRONTEND_URL=http://localhost:3000
 ```
 
@@ -371,9 +368,7 @@ MONGO_URI=mongodb+srv://QuickSnack:QuickSnack%4037@quicksnack.wmea4h4.mongodb.ne
 JWT_SECRET=your-secure-random-string-here-local-dev
 JWT_EXPIRES_IN=7d
 EMAIL_USER=vyomverma2873@gmail.com
-EMAIL_PASS=lefofhjcstycxxvz
-SMTP_HOST=smtp.gmail.com
-SMTP_PORT=587
+RESEND_API_KEY=your_resend_api_key_here
 FRONTEND_URL=https://your-vercel-app.vercel.app
 ```
 

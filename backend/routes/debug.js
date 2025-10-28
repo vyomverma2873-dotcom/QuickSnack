@@ -15,11 +15,11 @@ router.post('/test-email', async (req, res) => {
       });
     }
 
-    console.log('Testing email configuration...');
+    console.log('Testing Nodemailer email configuration...');
     console.log('EMAIL_USER:', process.env.EMAIL_USER);
     console.log('SMTP_HOST:', process.env.SMTP_HOST);
     console.log('SMTP_PORT:', process.env.SMTP_PORT);
-    console.log('EMAIL_PASS length:', process.env.EMAIL_PASS ? process.env.EMAIL_PASS.length : 'not set');
+    console.log('EMAIL_PASS set:', process.env.EMAIL_PASS ? 'Yes' : 'No');
 
     const result = await sendEmail(
       email,
