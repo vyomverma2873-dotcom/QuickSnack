@@ -118,8 +118,13 @@ userSchema.pre('save', async function(next) {
 
 // Compare password method
 userSchema.methods.comparePassword = async function(candidatePassword) {
-  if (!this.passwordHash) return false;
-  return bcrypt.compare(candidatePassword, this.passwordHash);
+  try {
+    if (!this.passwordHash || !candidatePassword) return false;
+    return await bcrypt.compare(candidatePassword, this.passwordHash);
+  } catch (error) {
+    console.error('Password comparison error:', error);
+    return false; // Return false instead of throwing an error
+  }
 };
 
 // Ensure only one default address

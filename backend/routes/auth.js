@@ -208,11 +208,19 @@ router.post('/login', async (req, res) => {
     const user = await User.findOne({ email: email.toLowerCase() });
     console.log(`👤 User found: ${!!user}, isVerified: ${user?.isVerified}, hasPasswordHash: ${!!user?.passwordHash}`);
     
-    if (!user || !user.isVerified) {
-      console.log('❌ User not found or not verified');
+    if (!user) {
+      console.log('❌ User not found');
       return res.status(400).json({
         success: false,
-        message: 'User not found or not verified'
+        message: 'User not found with this email'
+      });
+    }
+    
+    if (!user.isVerified) {
+      console.log('❌ User not verified');
+      return res.status(400).json({
+        success: false,
+        message: 'Account not verified. Please complete verification.'
       });
     }
 
@@ -254,14 +262,22 @@ router.post('/login', async (req, res) => {
       }
 
       console.log('🔍 Comparing password...');
-      const isValidPassword = await user.comparePassword(password);
-      console.log(`🔐 Password valid: ${isValidPassword}`);
-      
-      if (!isValidPassword) {
-        console.log('❌ Invalid credentials');
+      try {
+        const isValidPassword = await user.comparePassword(password);
+        console.log(`🔐 Password valid: ${isValidPassword}`);
+        
+        if (!isValidPassword) {
+          console.log('❌ Invalid credentials');
+          return res.status(400).json({
+            success: false,
+            message: 'Invalid credentials'
+          });
+        }
+      } catch (passwordError) {
+        console.error('Password comparison error:', passwordError);
         return res.status(400).json({
           success: false,
-          message: 'Invalid credentials'
+          message: 'Login failed. Please try again.'
         });
       }
 
@@ -285,9 +301,11 @@ router.post('/login', async (req, res) => {
 
   } catch (error) {
     console.error('Login error:', error);
+    console.error('Login error stack:', error.stack);
     res.status(500).json({
       success: false,
-      message: 'Internal server error'
+      message: 'Internal server error during login',
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 });
