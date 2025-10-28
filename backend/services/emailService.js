@@ -1,43 +1,30 @@
-const nodemailer = require('nodemailer');
+const sgMail = require('@sendgrid/mail');
 
-// Create transporter
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST,
-  port: process.env.SMTP_PORT,
-  secure: false, // true for 465, false for other ports
-  connectionTimeout: 10000, // 10s to establish connection
-  greetingTimeout: 10000,   // 10s to receive greeting after connection
-  socketTimeout: 10000,     // 10s for inactivity on the socket
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  }
-});
-
-// Verify transporter configuration
-transporter.verify((error, success) => {
-  if (error) {
-    console.error('Email transporter verification failed:', error);
-  } else {
-    console.log('Email transporter is ready to send messages');
-  }
-});
+// Initialize SendGrid
+if (process.env.SENDGRID_API_KEY) {
+  sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+} else {
+  console.warn('SENDGRID_API_KEY is not set. Emails will fail to send.');
+}
 
 const sendEmail = async (to, subject, html) => {
   try {
-    const mailOptions = {
-      from: `"QuickSnack" <${process.env.EMAIL_USER}>`,
+    const msg = {
       to,
+      from: {
+        email: process.env.EMAIL_USER || 'no-reply@quicksnack.app',
+        name: 'QuickSnack'
+      },
       subject,
       html
     };
 
-    const result = await transporter.sendMail(mailOptions);
-    console.log('Email sent successfully:', result.messageId);
-    return { success: true, messageId: result.messageId };
+    const result = await sgMail.send(msg);
+    const messageId = result?.[0]?.headers?.['x-message-id'] || 'unknown';
+    console.log('Email sent successfully via SendGrid:', messageId);
+    return { success: true, messageId };
   } catch (error) {
-    console.error('Email sending failed:', error);
-    // Do not throw here to avoid converting business operations into 500s upstream
+    console.error('SendGrid email sending failed:', error);
     return { success: false, error: error?.message || 'Failed to send email' };
   }
 };

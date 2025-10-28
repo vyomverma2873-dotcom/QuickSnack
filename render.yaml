@@ -19,14 +19,17 @@ services:
         generateValue: true
       - key: JWT_EXPIRES_IN
         value: 7d
+      - key: SENDGRID_API_KEY
+        value: YOUR_SENDGRID_API_KEY
       - key: EMAIL_USER
         value: vyomverma2873@gmail.com
-      - key: EMAIL_PASS
-        value: cuvimvzsleihrral
-      - key: SMTP_HOST
-        value: smtp.gmail.com
-      - key: SMTP_PORT
-        value: 587
+      # The following Gmail SMTP settings are no longer used after switching to SendGrid
+      # - key: EMAIL_PASS
+      #   value: cuvimvzsleihrral
+      # - key: SMTP_HOST
+      #   value: smtp.gmail.com
+      # - key: SMTP_PORT
+      #   value: 587
       - key: FRONTEND_URL
         fromService:
           type: web
