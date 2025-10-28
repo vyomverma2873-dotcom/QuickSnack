@@ -65,15 +65,14 @@ router.post('/signup', async (req, res) => {
     });
     await otpRecord.save();
 
-    // Send OTP email (non-blocking failure)
-    const emailResult = await sendEmail(
+    // Send OTP email (fire-and-forget, do not block response)
+    sendEmail(
       email,
       'Your QuickSnack OTP',
       generateOTPEmail(otp)
-    );
-    if (!emailResult?.success) {
-      console.error('Failed to send signup OTP email, proceeding anyway:', emailResult?.error);
-    }
+    ).then((r) => {
+      if (!r?.success) console.error('Failed to send signup OTP email:', r?.error);
+    }).catch((e) => console.error('Signup OTP email error:', e?.message || e));
 
     // Store user data temporarily (without saving to users collection yet)
     res.json({
@@ -160,15 +159,14 @@ router.post('/verify-otp', async (req, res) => {
     // Delete OTP record
     await OTP.deleteOne({ _id: otpRecord._id });
 
-    // Send welcome email (non-blocking failure)
-    const welcomeEmailResult = await sendEmail(
+    // Send welcome email (fire-and-forget)
+    sendEmail(
       email,
       'Welcome to QuickSnack — Thanks for joining!',
       generateWelcomeEmail(userData.name)
-    );
-    if (!welcomeEmailResult?.success) {
-      console.error('Failed to send welcome email, proceeding anyway:', welcomeEmailResult?.error);
-    }
+    ).then((r) => {
+      if (!r?.success) console.error('Failed to send welcome email:', r?.error);
+    }).catch((e) => console.error('Welcome email error:', e?.message || e));
 
     // Generate JWT token
     const token = generateToken(user._id);
@@ -245,15 +243,14 @@ router.post('/login', async (req, res) => {
       });
       await otpRecord.save();
 
-      // Send OTP email (non-blocking failure)
-      const loginEmailResult = await sendEmail(
+      // Send OTP email (fire-and-forget)
+      sendEmail(
         email,
         'Your QuickSnack OTP',
         generateOTPEmail(otp)
-      );
-      if (!loginEmailResult?.success) {
-        console.error('Failed to send login OTP email, proceeding anyway:', loginEmailResult?.error);
-      }
+      ).then((r) => {
+        if (!r?.success) console.error('Failed to send login OTP email:', r?.error);
+      }).catch((e) => console.error('Login OTP email error:', e?.message || e));
 
       res.json({
         success: true,
@@ -446,15 +443,14 @@ router.post('/forgot-password', otpLimiter, async (req, res) => {
     });
     await otpRecord.save();
 
-    // Send OTP email (non-blocking failure)
-    const resetOtpEmailResult = await sendEmail(
+    // Send OTP email (fire-and-forget)
+    sendEmail(
       email,
       'Reset Your QuickSnack Password',
       generateOTPEmail(otp, 'Password Reset')
-    );
-    if (!resetOtpEmailResult?.success) {
-      console.error('Failed to send reset-password OTP email, proceeding anyway:', resetOtpEmailResult?.error);
-    }
+    ).then((r) => {
+      if (!r?.success) console.error('Failed to send reset-password OTP email:', r?.error);
+    }).catch((e) => console.error('Reset-password OTP email error:', e?.message || e));
 
     res.json({
       success: true,
@@ -616,8 +612,8 @@ router.post('/reset-password', async (req, res) => {
     // Delete OTP record
     await OTP.deleteOne({ _id: otpRecord._id });
 
-    // Send confirmation email (non-blocking failure)
-    const resetConfirmationResult = await sendEmail(
+    // Send confirmation email (fire-and-forget)
+    sendEmail(
       email,
       'Password Reset Successful',
       `
@@ -629,10 +625,9 @@ router.post('/reset-password', async (req, res) => {
         <p>Best regards,<br>The QuickSnack Team</p>
       </div>
       `
-    );
-    if (!resetConfirmationResult?.success) {
-      console.error('Failed to send password reset confirmation email, proceeding anyway:', resetConfirmationResult?.error);
-    }
+    ).then((r) => {
+      if (!r?.success) console.error('Failed to send password reset confirmation email:', r?.error);
+    }).catch((e) => console.error('Password reset confirmation email error:', e?.message || e));
 
     res.json({
       success: true,

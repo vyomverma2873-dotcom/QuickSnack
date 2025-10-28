@@ -96,7 +96,14 @@ const LoginPage: React.FC = () => {
         }, 1000);
       }
     } catch (error: any) {
-      if (error.response) {
+      if (error.code === 'ECONNABORTED') {
+        // Request timed out (10s). If OTP flow, show OTP input anyway.
+        if (useOTP) {
+          setOtpSent(true);
+          setSuccessMessage('If you didn\'t receive the OTP yet, please check spam or try again.');
+        }
+        setErrorMessage('Request timed out. Please try again.');
+      } else if (error.response) {
         const status = error.response.status;
         console.error("Login failed:", error.response.data);
         if (status === 400 || status === 401) {

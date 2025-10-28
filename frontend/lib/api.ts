@@ -10,7 +10,7 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
   withCredentials: true, // Enable sending cookies with requests
-  timeout: 0, // 0 means no timeout (infinite)
+  timeout: 10000, // 10 seconds global timeout
 });
 
 // Request interceptor to add auth token
