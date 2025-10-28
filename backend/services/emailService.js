@@ -34,7 +34,8 @@ const sendEmail = async (to, subject, html) => {
     return { success: true, messageId: result.messageId };
   } catch (error) {
     console.error('Email sending failed:', error);
-    throw new Error('Failed to send email');
+    // Do not throw here to avoid converting business operations into 500s upstream
+    return { success: false, error: error?.message || 'Failed to send email' };
   }
 };
 

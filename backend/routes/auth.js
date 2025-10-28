@@ -65,12 +65,15 @@ router.post('/signup', async (req, res) => {
     });
     await otpRecord.save();
 
-    // Send OTP email
-    await sendEmail(
+    // Send OTP email (non-blocking failure)
+    const emailResult = await sendEmail(
       email,
       'Your QuickSnack OTP',
       generateOTPEmail(otp)
     );
+    if (!emailResult?.success) {
+      console.error('Failed to send signup OTP email, proceeding anyway:', emailResult?.error);
+    }
 
     // Store user data temporarily (without saving to users collection yet)
     res.json({
@@ -157,12 +160,15 @@ router.post('/verify-otp', async (req, res) => {
     // Delete OTP record
     await OTP.deleteOne({ _id: otpRecord._id });
 
-    // Send welcome email
-    await sendEmail(
+    // Send welcome email (non-blocking failure)
+    const welcomeEmailResult = await sendEmail(
       email,
       'Welcome to QuickSnack — Thanks for joining!',
       generateWelcomeEmail(userData.name)
     );
+    if (!welcomeEmailResult?.success) {
+      console.error('Failed to send welcome email, proceeding anyway:', welcomeEmailResult?.error);
+    }
 
     // Generate JWT token
     const token = generateToken(user._id);
@@ -239,12 +245,15 @@ router.post('/login', async (req, res) => {
       });
       await otpRecord.save();
 
-      // Send OTP email
-      await sendEmail(
+      // Send OTP email (non-blocking failure)
+      const loginEmailResult = await sendEmail(
         email,
         'Your QuickSnack OTP',
         generateOTPEmail(otp)
       );
+      if (!loginEmailResult?.success) {
+        console.error('Failed to send login OTP email, proceeding anyway:', loginEmailResult?.error);
+      }
 
       res.json({
         success: true,
@@ -437,12 +446,15 @@ router.post('/forgot-password', otpLimiter, async (req, res) => {
     });
     await otpRecord.save();
 
-    // Send OTP email
-    await sendEmail(
+    // Send OTP email (non-blocking failure)
+    const resetOtpEmailResult = await sendEmail(
       email,
       'Reset Your QuickSnack Password',
       generateOTPEmail(otp, 'Password Reset')
     );
+    if (!resetOtpEmailResult?.success) {
+      console.error('Failed to send reset-password OTP email, proceeding anyway:', resetOtpEmailResult?.error);
+    }
 
     res.json({
       success: true,
@@ -604,8 +616,8 @@ router.post('/reset-password', async (req, res) => {
     // Delete OTP record
     await OTP.deleteOne({ _id: otpRecord._id });
 
-    // Send confirmation email
-    await sendEmail(
+    // Send confirmation email (non-blocking failure)
+    const resetConfirmationResult = await sendEmail(
       email,
       'Password Reset Successful',
       `
@@ -618,6 +630,9 @@ router.post('/reset-password', async (req, res) => {
       </div>
       `
     );
+    if (!resetConfirmationResult?.success) {
+      console.error('Failed to send password reset confirmation email, proceeding anyway:', resetConfirmationResult?.error);
+    }
 
     res.json({
       success: true,
