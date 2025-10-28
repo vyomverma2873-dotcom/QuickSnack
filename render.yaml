@@ -22,7 +22,7 @@ services:
       - key: EMAIL_USER
         value: vyomverma2873@gmail.com
       - key: EMAIL_PASS
-        value: YOUR_NEW_16_CHAR_APP_PASSWORD
+        value: cuvimvzsleihrral
       - key: SMTP_HOST
         value: smtp.gmail.com
       - key: SMTP_PORT
