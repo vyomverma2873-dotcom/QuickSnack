@@ -36,8 +36,9 @@ const allowedOrigins = [
   'http://localhost:3000',
   'http://127.0.0.1:3000',
   'https://quicksnack-final-backend.onrender.com',
+  'https://quicksnack-eight.vercel.app', // Your Vercel deployment
   process.env.FRONTEND_URL,
-  // Allow Vercel preview deployments
+  // Allow all Vercel preview deployments
   /^https:\/\/.*\.vercel\.app$/
 ].filter(Boolean);
 
