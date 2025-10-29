@@ -3,6 +3,10 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
+const path = require('path');
+
+// Load environment variables from .env.local first (for local dev with secrets), then .env
+require('dotenv').config({ path: path.join(__dirname, '.env.local') });
 require('dotenv').config();
 
 const authRoutes = require('./routes/auth');

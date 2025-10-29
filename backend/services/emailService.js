@@ -1,57 +1,55 @@
-const nodemailer = require('nodemailer');
+const SibApiV3Sdk = require('sib-api-v3-sdk');
 
-// Create Nodemailer transporter
-const transporter = nodemailer.createTransport({
-  host: process.env.SMTP_HOST || 'smtp.gmail.com',
-  port: parseInt(process.env.SMTP_PORT) || 465,
-  secure: true, // true for 465 (SSL), false for 587 (TLS)
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS
-  },
-  // Add timeout and connection options for better reliability
-  connectionTimeout: 10000, // 10 seconds
-  greetingTimeout: 10000,
-  socketTimeout: 10000
-});
+// Initialize Brevo API client
+const defaultClient = SibApiV3Sdk.ApiClient.instance;
+const apiKey = defaultClient.authentications['api-key'];
+apiKey.apiKey = process.env.BREVO_API_KEY;
 
-// Verify transporter configuration
-transporter.verify(function (error, success) {
-  if (error) {
-    console.error('❌ Email transporter verification failed:', error);
-  } else {
-    console.log('✅ Email server is ready to send messages');
-  }
-});
+const apiInstance = new SibApiV3Sdk.TransactionalEmailsApi();
+
+// Verify API key on startup
+if (process.env.BREVO_API_KEY) {
+  console.log('✅ Brevo API initialized successfully');
+  console.log(`   API Key: ${process.env.BREVO_API_KEY.substring(0, 20)}...`);
+  console.log(`   Sender Email: ${process.env.BREVO_SENDER_EMAIL || 'vyomverma2873@gmail.com'}`);
+} else {
+  console.error('❌ BREVO_API_KEY not found in environment variables');
+}
 
 const sendEmail = async (to, subject, html) => {
   try {
-    console.log(`📧 Attempting to send email to: ${to}`);
+    console.log(`📧 Attempting to send email via Brevo to: ${to}`);
     console.log(`   Subject: ${subject}`);
-    console.log(`   From: ${process.env.EMAIL_USER}`);
+    console.log(`   From: ${process.env.BREVO_SENDER_EMAIL || 'vyomverma2873@gmail.com'}`);
     
-    const mailOptions = {
-      from: `"QuickSnack" <${process.env.EMAIL_USER}>`,
-      to: to,
-      subject: subject,
-      html: html
+    const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+    
+    sendSmtpEmail.sender = {
+      name: 'QuickSnack',
+      email: process.env.BREVO_SENDER_EMAIL || 'vyomverma2873@gmail.com'
     };
-
-    const info = await transporter.sendMail(mailOptions);
     
-    console.log('✅ Email sent successfully via Nodemailer!');
-    console.log(`   Message ID: ${info.messageId}`);
+    sendSmtpEmail.to = [{ email: to }];
+    sendSmtpEmail.subject = subject;
+    sendSmtpEmail.htmlContent = html;
+    
+    const result = await apiInstance.sendTransacEmail(sendSmtpEmail);
+    
+    console.log('✅ Email sent successfully via Brevo!');
+    console.log(`   Message ID: ${result.messageId}`);
     console.log(`   To: ${to}`);
-    console.log(`   Response: ${info.response}`);
     
-    return { success: true, messageId: info.messageId };
+    return { success: true, messageId: result.messageId };
   } catch (error) {
-    console.error('❌ Nodemailer email sending failed!');
+    console.error('❌ Brevo email sending failed!');
     console.error(`   To: ${to}`);
-    console.error(`   Error: ${error?.message}`);
-    console.error(`   Full error:`, error);
+    console.error(`   Error: ${error?.message || error}`);
+    console.error(`   Response:`, error?.response?.text || error?.response?.body || 'No response details');
     
-    return { success: false, error: error?.message || 'Failed to send email' };
+    return { 
+      success: false, 
+      error: error?.message || error?.response?.text || 'Failed to send email via Brevo' 
+    };
   }
 };
 
